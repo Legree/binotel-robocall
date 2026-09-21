@@ -1,0 +1,8 @@
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends asterisk asterisk-core-sounds-en-gsm \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /var/lib/asterisk/sounds/robocall && chown -R asterisk:asterisk /var/lib/asterisk/sounds
+COPY asterisk/pjsip.conf asterisk/extensions.conf asterisk/manager.conf asterisk/rtp.conf /etc/asterisk/
+COPY docker/asterisk-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

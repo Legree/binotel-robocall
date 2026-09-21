@@ -1,0 +1,32 @@
+# Тест і прод - одна команда: docker compose up -d
+# network_mode: host - щоб SIP/RTP і AMI працювали без прокидання портів.
+services:
+  asterisk:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.asterisk
+    env_file: .env
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - sounds:/var/lib/asterisk/sounds/robocall
+
+  bot:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.bot
+    env_file: .env
+    environment:
+      AMI_HOST: 127.0.0.1
+      SOUNDS_DIR: /var/lib/asterisk/sounds/robocall
+      DB_PATH: /data/robocall.sqlite
+    network_mode: host
+    restart: unless-stopped
+    depends_on: [asterisk]
+    volumes:
+      - sounds:/var/lib/asterisk/sounds/robocall
+      - data:/data
+
+volumes:
+  sounds:
+  data:
